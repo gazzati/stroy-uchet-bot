@@ -60,21 +60,33 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/stroy-uchet-bot
+
             if [ ! -f .env ]; then
               echo "Missing required file: .env"
               exit 1
             fi
+
             if [ ! -f docker-compose.yml ]; then
               echo "Missing required file: docker-compose.yml"
               exit 1
             fi
+
             echo "IMAGE_TAG=${{ needs.build-and-push.outputs.image_tag }}" > .env.deploy
+
+            set -a
+            . ./.env
+            . ./.env.deploy
+            set +a
+
             mkdir -p logs/archive
             TS=$(date +%F_%H-%M-%S)
-            CID=$(docker compose --env-file .env --env-file .env.deploy ps -q stroy-uchet-bot)
+
+            CID=$(docker-compose ps -q stroy-uchet-bot)
+
             if [ -n "$CID" ]; then
               docker logs --timestamps "$CID" > "logs/archive/stroy-uchet-bot_${TS}.log" 2>&1 || true
             fi
-            docker compose --env-file .env --env-file .env.deploy pull stroy-uchet-bot
-            docker compose --env-file .env --env-file .env.deploy up -d stroy-uchet-bot postgres
+
+            docker-compose pull stroy-uchet-bot
+            docker-compose up -d stroy-uchet-bot postgres
 
