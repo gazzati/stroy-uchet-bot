@@ -9,7 +9,7 @@ import {
   expensesListKeyboard
 } from "../keyboards/expenses.js";
 import { CB, cb } from "../callbacks/actions.js";
-import { renderScreen } from "./main-menu.js";
+import { renderScreen, renderPhotoScreen } from "./main-menu.js";
 
 export async function showMyExpenses(ctx: AuthedContext, services: Services, page = 0): Promise<void> {
   const user = requireUser(ctx);
@@ -40,11 +40,14 @@ function canEdit(ctx: AuthedContext, expense: Expense): boolean {
 
 export async function showExpenseCard(ctx: AuthedContext, services: Services, expenseId: string): Promise<void> {
   const expense = await services.expenses.requireExpense(expenseId);
-  await renderScreen(
-    ctx,
-    expenseLine(expense),
-    expenseCardKeyboard(expense, { canEdit: canEdit(ctx, expense) }, cb(CB.OBJ, expense.object_id))
-  );
+  const keyboard = expenseCardKeyboard(expense, { canEdit: canEdit(ctx, expense) }, cb(CB.OBJ, expense.object_id));
+  const text = expenseLine(expense);
+
+  if (expense.document_photo_file_id) {
+    await renderPhotoScreen(ctx, expense.document_photo_file_id, text, keyboard);
+    return;
+  }
+  await renderScreen(ctx, text, keyboard);
 }
 
 export async function confirmDeleteExpense(ctx: AuthedContext, services: Services, expenseId: string): Promise<void> {
