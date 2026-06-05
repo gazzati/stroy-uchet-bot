@@ -32,6 +32,7 @@ pnpm-debug.log*
 # Package manager caches
 .npm/
 .pnpm-store/
+.yarn/install-state.gz
 
 # OS and editor files
 .DS_Store
@@ -43,4 +44,3 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
-
