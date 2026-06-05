@@ -5,7 +5,7 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/stroy_uchet_bot
-    command: ["node", "build/index.js"]
+    command: ["sh", "-c", "node build/db/migrate.js && node build/index.js"]
     depends_on:
       postgres:
         condition: service_healthy
