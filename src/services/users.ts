@@ -1,9 +1,15 @@
 import { sql } from "kysely";
 import type { AppDb } from "../db/index.js";
-import type { ConstructionObject, User, UserRole } from "../db/schema.js";
+import type { ConstructionObject, ForemanApplication, User, UserRole } from "../db/schema.js";
 import { NotFoundError, ValidationError } from "../domain/errors.js";
 
 export type CreateForemanInput = {
+  telegramId: bigint;
+  name: string;
+  username?: string | null;
+};
+
+export type CreateForemanApplicationInput = {
   telegramId: bigint;
   name: string;
   username?: string | null;
@@ -94,6 +100,141 @@ export class UserService {
       .execute();
 
     return user;
+  }
+
+  async createOrUpdateForemanApplication(input: CreateForemanApplicationInput): Promise<ForemanApplication> {
+    const name = input.name.trim();
+    if (!name) {
+      throw new ValidationError("Имя и фамилия не могут быть пустыми");
+    }
+
+    const existingUser = await this.findByTelegramId(input.telegramId, { includeBlocked: true });
+    if (existingUser && !existingUser.deleted_at) {
+      throw new ValidationError("Пользователь уже зарегистрирован в системе");
+    }
+
+    const existingApplication = await this.findPendingForemanApplication(input.telegramId);
+    if (existingApplication) {
+      const [application] = await this.db
+        .updateTable("foreman_applications")
+        .set({ name, username: input.username ?? null, updated_at: new Date() })
+        .where("id", "=", existingApplication.id)
+        .returningAll()
+        .execute();
+
+      return application;
+    }
+
+    const [application] = await this.db
+      .insertInto("foreman_applications")
+      .values({
+        telegram_id: input.telegramId,
+        name,
+        username: input.username ?? null,
+        status: "pending"
+      })
+      .returningAll()
+      .execute();
+
+    return application;
+  }
+
+  async findPendingForemanApplication(telegramId: bigint): Promise<ForemanApplication | null> {
+    return (
+      (await this.db
+        .selectFrom("foreman_applications")
+        .selectAll()
+        .where("telegram_id", "=", telegramId.toString())
+        .where("status", "=", "pending")
+        .executeTakeFirst()) ?? null
+    );
+  }
+
+  async listPendingForemanApplications(): Promise<ForemanApplication[]> {
+    return this.db
+      .selectFrom("foreman_applications")
+      .selectAll()
+      .where("status", "=", "pending")
+      .orderBy("created_at", "asc")
+      .execute();
+  }
+
+  async requireForemanApplication(applicationId: string): Promise<ForemanApplication> {
+    const application = await this.db
+      .selectFrom("foreman_applications")
+      .selectAll()
+      .where("id", "=", applicationId)
+      .executeTakeFirst();
+
+    if (!application) {
+      throw new NotFoundError("Заявка не найдена");
+    }
+
+    return application;
+  }
+
+  async acceptForemanApplication(applicationId: string, adminId: string): Promise<User> {
+    return this.db.transaction().execute(async (trx) => {
+      const application = await trx
+        .selectFrom("foreman_applications")
+        .selectAll()
+        .where("id", "=", applicationId)
+        .where("status", "=", "pending")
+        .executeTakeFirst();
+
+      if (!application) {
+        throw new NotFoundError("Активная заявка не найдена");
+      }
+
+      const existing = await trx
+        .selectFrom("users")
+        .selectAll()
+        .where("telegram_id", "=", application.telegram_id)
+        .where("deleted_at", "is", null)
+        .executeTakeFirst();
+
+      if (existing) {
+        await trx
+          .updateTable("foreman_applications")
+          .set({ status: "accepted", reviewed_by: adminId, reviewed_at: new Date(), updated_at: new Date() })
+          .where("id", "=", application.id)
+          .execute();
+        return existing;
+      }
+
+      const [user] = await trx
+        .insertInto("users")
+        .values({
+          telegram_id: application.telegram_id,
+          role: "foreman",
+          name: application.name,
+          username: application.username,
+          is_blocked: false
+        })
+        .returningAll()
+        .execute();
+
+      await trx
+        .updateTable("foreman_applications")
+        .set({ status: "accepted", reviewed_by: adminId, reviewed_at: new Date(), updated_at: new Date() })
+        .where("id", "=", application.id)
+        .execute();
+
+      return user;
+    });
+  }
+
+  async declineForemanApplication(applicationId: string, adminId: string): Promise<void> {
+    const result = await this.db
+      .updateTable("foreman_applications")
+      .set({ status: "declined", reviewed_by: adminId, reviewed_at: new Date(), updated_at: new Date() })
+      .where("id", "=", applicationId)
+      .where("status", "=", "pending")
+      .executeTakeFirst();
+
+    if (Number(result.numUpdatedRows) === 0) {
+      throw new NotFoundError("Активная заявка не найдена");
+    }
   }
 
   async listForemen(): Promise<User[]> {

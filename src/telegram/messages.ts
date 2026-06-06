@@ -1,4 +1,4 @@
-import type { ConstructionObject, Expense, User } from "../db/schema.js";
+import type { ConstructionObject, Expense, ForemanApplication, User } from "../db/schema.js";
 import type { ObjectWithBudget } from "../services/objects.js";
 import type { ExpenseDraft } from "./session.js";
 import { formatMoney } from "../utils/money.js";
@@ -62,6 +62,15 @@ export function foremanCard(foreman: User, objects: ConstructionObject[]): strin
     lines.push("Активных объектов нет.");
   }
   return lines.join("\n");
+}
+
+export function foremanApplicationLine(application: ForemanApplication): string {
+  const parts = [`👷 ${application.name}`, `Telegram ID: ${application.telegram_id}`];
+  if (application.username) {
+    parts.push(`Username: @${application.username}`);
+  }
+  parts.push("Статус: ожидает решения");
+  return parts.join("\n");
 }
 
 export function expenseLine(expense: Expense): string {

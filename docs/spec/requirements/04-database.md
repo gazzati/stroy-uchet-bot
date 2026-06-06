@@ -24,6 +24,27 @@
 - index по `role`;
 - index по `is_blocked`.
 
+## `foreman_applications`
+
+Заявки бригадиров на доступ к боту.
+
+| Поле | Тип | Ограничения | Описание |
+| --- | --- | --- | --- |
+| `id` | bigint | PK | ID заявки |
+| `telegram_id` | bigint | not null | Telegram ID заявителя |
+| `name` | text | not null | Имя и фамилия заявителя |
+| `username` | text | nullable | Telegram username |
+| `status` | text | not null | `pending`, `accepted` или `declined` |
+| `reviewed_by` | bigint | FK `users.id`, nullable | Администратор, принявший решение |
+| `reviewed_at` | timestamptz | nullable | Дата решения |
+| `created_at` | timestamptz | not null | Дата создания |
+| `updated_at` | timestamptz | not null | Дата обновления |
+
+Индексы:
+
+- unique index по `telegram_id`, если `status = 'pending'`;
+- index по `status`.
+
 ## `objects`
 
 Строительные объекты.
@@ -96,6 +117,7 @@
 Предварительные ограничения:
 
 - `users.role in ('admin', 'foreman')`;
+- `foreman_applications.status in ('pending', 'accepted', 'declined')`;
 - `objects.status in ('active', 'archived')`;
 - `objects.budget_amount >= 0`;
 - `expenses.type in ('manual_purchase', 'document_purchase', 'bank_transfer', 'service_payment')`;

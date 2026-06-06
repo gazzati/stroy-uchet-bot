@@ -3,7 +3,7 @@ import type { AppConfig } from "../config/index.js";
 import { AppError } from "../domain/errors.js";
 import type { Services } from "../services/index.js";
 import { logger } from "../utils/logger.js";
-import { authMiddleware } from "./auth.js";
+import { authMiddleware, publicAccessMiddleware } from "./auth.js";
 import { describeCallback } from "./callbacks/actions.js";
 import { registerCallbackRouter } from "./callbacks/router.js";
 import { showMainMenu } from "./flows/main-menu.js";
@@ -29,6 +29,7 @@ export function createBot(config: AppConfig, services: Services): Bot<AuthedCont
     logger.debug({ telegramId: ctx.from?.id, ms: Date.now() - start }, "Update handled");
   });
 
+  bot.use(publicAccessMiddleware(services));
   bot.use(authMiddleware(services));
 
   const openMenu = async (ctx: AuthedContext) => {
