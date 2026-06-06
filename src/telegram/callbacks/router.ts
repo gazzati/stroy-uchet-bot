@@ -27,6 +27,12 @@ import {
   toggleBlock
 } from "../flows/foremen.js";
 import {
+  acceptApplication,
+  declineApplication,
+  showApplicationCard,
+  showApplicationsList
+} from "../flows/applications.js";
+import {
   confirmDeleteExpense,
   doDeleteExpense,
   showExpenseCard,
@@ -184,6 +190,16 @@ async function dispatch(
     case CB.FRM_DEL_CONFIRM:
       return doDeleteForeman(ctx, services, a);
 
+    // --- Foreman applications ---
+    case CB.APP_LIST:
+      return showApplicationsList(ctx, services, 0);
+    case CB.APP:
+      return showApplicationCard(ctx, services, a);
+    case CB.APP_ACCEPT:
+      return acceptApplication(ctx, services, a);
+    case CB.APP_DECLINE:
+      return declineApplication(ctx, services, a);
+
     // --- Expenses (view/edit/delete) ---
     case CB.MY_EXP:
       return showMyExpenses(ctx, services, 0);
@@ -262,6 +278,8 @@ async function dispatchPage(ctx: AuthedContext, services: Services, listCode: st
       return showArchivedObjects(ctx, services, page);
     case CB.FRM_LIST:
       return showForemenList(ctx, services, page);
+    case CB.APP_LIST:
+      return showApplicationsList(ctx, services, page);
     case CB.MY_EXP:
       return showMyExpenses(ctx, services, page);
     default:

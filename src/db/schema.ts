@@ -5,6 +5,7 @@ export type Numeric = ColumnType<string, string | number, string | number>;
 export type Timestamp = ColumnType<Date, Date | string | undefined, Date | string>;
 
 export type UserRole = "admin" | "foreman";
+export type ForemanApplicationStatus = "pending" | "accepted" | "declined";
 export type ObjectStatus = "active" | "archived";
 export type ExpenseType = "manual_purchase" | "document_purchase" | "bank_transfer" | "service_payment";
 
@@ -18,6 +19,18 @@ export interface UsersTable {
   created_at: Timestamp;
   updated_at: Timestamp;
   deleted_at: Timestamp | null;
+}
+
+export interface ForemanApplicationsTable {
+  id: Generated<string>;
+  telegram_id: Int8;
+  name: string;
+  username: string | null;
+  status: ColumnType<ForemanApplicationStatus, ForemanApplicationStatus | undefined, ForemanApplicationStatus>;
+  reviewed_by: Int8 | null;
+  reviewed_at: Timestamp | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
 }
 
 export interface ObjectsTable {
@@ -57,6 +70,7 @@ export interface ExpensesTable {
 
 export interface Database {
   users: UsersTable;
+  foreman_applications: ForemanApplicationsTable;
   objects: ObjectsTable;
   object_foremen: ObjectForemenTable;
   expenses: ExpensesTable;
@@ -65,6 +79,9 @@ export interface Database {
 export type User = Selectable<UsersTable>;
 export type NewUser = Insertable<UsersTable>;
 export type UserUpdate = Updateable<UsersTable>;
+
+export type ForemanApplication = Selectable<ForemanApplicationsTable>;
+export type NewForemanApplication = Insertable<ForemanApplicationsTable>;
 
 export type ConstructionObject = Selectable<ObjectsTable>;
 export type NewConstructionObject = Insertable<ObjectsTable>;

@@ -13,7 +13,7 @@ export function foremenListKeyboard(foremen: ForemanWithAssignments[], page: num
   }
 
   appendPagination(keyboard, CB.FRM_LIST, paged.page, paged.totalPages);
-  keyboard.row().text("➕ Добавить бригадира", cb(CB.FRM_NEW)).row().text("◀️ Меню", cb(CB.MENU));
+  keyboard.row().text("◀️ Меню", cb(CB.MENU));
   return keyboard;
 }
 

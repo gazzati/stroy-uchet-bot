@@ -31,6 +31,11 @@ export const CB = {
   FRM_DEL: "FD",
   FRM_DEL_CONFIRM: "FDC",
 
+  APP_LIST: "AL",
+  APP: "A",
+  APP_ACCEPT: "AA",
+  APP_DECLINE: "AD",
+
   EXP_ADD: "EA",
   EXP_OBJ: "EO",
   EXP_TYPE: "ET",
@@ -75,6 +80,10 @@ export const ADMIN_CODES = new Set<string>([
   CB.FRM_BLOCK,
   CB.FRM_DEL,
   CB.FRM_DEL_CONFIRM,
+  CB.APP_LIST,
+  CB.APP,
+  CB.APP_ACCEPT,
+  CB.APP_DECLINE,
   CB.REP_MENU,
   CB.REP_OBJ,
   CB.REP_FRM

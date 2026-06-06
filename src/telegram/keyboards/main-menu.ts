@@ -8,6 +8,8 @@ export function mainMenuKeyboard(user: User): InlineKeyboard {
       .text("🏗 Объекты", cb(CB.OBJ_LIST))
       .text("👷 Бригадиры", cb(CB.FRM_LIST))
       .row()
+      .text("📝 Заявки", cb(CB.APP_LIST))
+      .row()
       .text("📊 Отчёты", cb(CB.REP_MENU));
   }
 

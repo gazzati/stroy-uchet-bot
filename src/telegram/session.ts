@@ -30,6 +30,11 @@ export type RenameForemanFlow = {
   foremanId: string;
 };
 
+export type ForemanApplicationFlow = {
+  kind: "foreman_application";
+  step: "name";
+};
+
 export type ExpenseDraft = {
   title?: string;
   quantity?: string;
@@ -70,6 +75,7 @@ export type EditExpenseFlow = {
 export type Flow =
   | CreateObjectFlow
   | CreateForemanFlow
+  | ForemanApplicationFlow
   | RenameObjectFlow
   | ObjectBudgetFlow
   | RenameForemanFlow

@@ -22,6 +22,23 @@ create unique index if not exists users_telegram_id_active_uidx
 create index if not exists users_role_idx on users (role);
 create index if not exists users_is_blocked_idx on users (is_blocked);
 
+create table if not exists foreman_applications (
+  id bigserial primary key,
+  telegram_id bigint not null,
+  name text not null check (length(trim(name)) > 0),
+  username text,
+  status text not null default 'pending' check (status in ('pending', 'accepted', 'declined')),
+  reviewed_by bigint references users(id),
+  reviewed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create unique index if not exists foreman_applications_pending_telegram_id_uidx
+  on foreman_applications (telegram_id)
+  where status = 'pending';
+create index if not exists foreman_applications_status_idx on foreman_applications (status);
+
 create table if not exists objects (
   id bigserial primary key,
   title text not null check (length(trim(title)) > 0),
