@@ -14,10 +14,16 @@ export async function showForemenList(ctx: AuthedContext, services: Services, pa
   await renderScreen(ctx, text, foremenListKeyboard(foremen, page));
 }
 
-export async function showForemanCard(ctx: AuthedContext, services: Services, foremanId: string): Promise<void> {
+export async function showForemanCard(
+  ctx: AuthedContext,
+  services: Services,
+  foremanId: string,
+  notice?: string
+): Promise<void> {
   const foreman = await services.users.requireUser(foremanId);
   const objects = await services.users.listObjectsForForeman(foremanId);
-  await renderScreen(ctx, foremanCard(foreman, objects), foremanCardKeyboard(foreman));
+  const text = notice ? `${notice}\n\n${foremanCard(foreman, objects)}` : foremanCard(foreman, objects);
+  await renderScreen(ctx, text, foremanCardKeyboard(foreman));
 }
 
 export async function toggleBlock(ctx: AuthedContext, services: Services, foremanId: string): Promise<void> {
