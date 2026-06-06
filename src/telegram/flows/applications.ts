@@ -6,9 +6,15 @@ import { foremanApplicationLine } from "../messages.js";
 import { showForemanCard } from "./foremen.js";
 import { renderScreen } from "./main-menu.js";
 
-export async function showApplicationsList(ctx: AuthedContext, services: Services, page = 0): Promise<void> {
+export async function showApplicationsList(
+  ctx: AuthedContext,
+  services: Services,
+  page = 0,
+  notice?: string
+): Promise<void> {
   const applications = await services.users.listPendingForemanApplications();
-  const text = applications.length ? "📝 Заявки от бригадиров" : "Новых заявок нет.";
+  const title = applications.length ? "📝 Заявки от бригадиров" : "Новых заявок нет.";
+  const text = notice ? `${notice}\n\n${title}` : title;
   await renderScreen(ctx, text, applicationsListKeyboard(applications, page));
 }
 
@@ -31,8 +37,7 @@ export async function acceptApplication(
   await ctx.api
     .sendMessage(foreman.telegram_id, "Заявка принята. Теперь вам доступно меню бригадира: /start")
     .catch(() => {});
-  await ctx.reply("Заявка принята. Бригадир получил доступ.");
-  await showForemanCard(ctx, services, foreman.id);
+  await showForemanCard(ctx, services, foreman.id, "Заявка принята. Бригадир получил доступ.");
 }
 
 export async function declineApplication(
@@ -44,6 +49,5 @@ export async function declineApplication(
   const application = await services.users.requireForemanApplication(applicationId);
   await services.users.declineForemanApplication(applicationId, admin.id);
   await ctx.api.sendMessage(application.telegram_id, "Заявка на доступ отклонена.").catch(() => {});
-  await ctx.reply("Заявка отклонена.");
-  await showApplicationsList(ctx, services, 0);
+  await showApplicationsList(ctx, services, 0, "Заявка отклонена.");
 }

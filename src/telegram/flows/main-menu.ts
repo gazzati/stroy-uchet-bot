@@ -5,17 +5,13 @@ import { mainMenuKeyboard } from "../keyboards/main-menu.js";
 import { mainMenuTitle } from "../messages.js";
 
 /**
- * Renders a screen: edits the current message when triggered from a callback,
- * otherwise sends a new message (commands, after wizard steps).
+ * Renders a screen as the latest chat message. Callback-driven navigation removes
+ * the previous button screen first, so stale controls do not remain above new bot
+ * messages such as documents or confirmations.
  */
 export async function renderScreen(ctx: AuthedContext, text: string, keyboard: InlineKeyboard): Promise<void> {
   if (ctx.callbackQuery) {
-    try {
-      await ctx.editMessageText(text, { reply_markup: keyboard });
-      return;
-    } catch {
-      // Message may be unchanged or no longer editable (e.g. it had a document); fall back to a new message.
-    }
+    await ctx.deleteMessage().catch(() => {});
   }
   await ctx.reply(text, { reply_markup: keyboard });
 }
