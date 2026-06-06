@@ -21,10 +21,6 @@ export class ReportService {
     return this.expenseRows((query) => query.where("expenses.object_id", "=", objectId));
   }
 
-  async expensesByForeman(foremanId: string): Promise<ExpenseReportRow[]> {
-    return this.expenseRows((query) => query.where("expenses.author_id", "=", foremanId));
-  }
-
   private async expenseRows(
     filter: (
       query: ReturnType<ReportService["baseExpenseQuery"]>
@@ -81,4 +77,3 @@ export function translateExpenseType(type: string): string {
       return type;
   }
 }
-

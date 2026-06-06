@@ -39,13 +39,7 @@ import {
   showMyExpenses,
   showObjectExpenses
 } from "../flows/expenses.js";
-import {
-  sendForemanReport,
-  sendObjectReport,
-  showReportForemanPicker,
-  showReportObjectPicker,
-  showReportsMenu
-} from "../flows/reports.js";
+import { sendObjectReport } from "../flows/reports.js";
 import {
   beginExpenseWizard,
   chooseExpenseType,
@@ -234,12 +228,8 @@ async function dispatch(
       return showMainMenu(ctx);
 
     // --- Reports ---
-    case CB.REP_MENU:
-      return showReportsMenu(ctx);
     case CB.REP_OBJ:
-      return a ? sendObjectReport(ctx, services, config, a) : showReportObjectPicker(ctx, services);
-    case CB.REP_FRM:
-      return a ? sendForemanReport(ctx, services, config, a) : showReportForemanPicker(ctx, services);
+      return sendObjectReport(ctx, services, config, a);
 
     default:
       // Unknown / orphaned callback (e.g. session lost after restart) — fall back to the menu.

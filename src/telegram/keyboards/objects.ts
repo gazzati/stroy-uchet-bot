@@ -63,6 +63,7 @@ export function objectCardKeyboard(object: ObjectWithBudget, options: { admin: b
     } else {
       keyboard.text("♻️ Восстановить", cb(CB.OBJ_RESTORE, object.id)).row();
     }
+    keyboard.text("📊 Отчёт", cb(CB.REP_OBJ, object.id)).row();
   }
 
   keyboard.text("◀️ Объекты", object.status === "active" ? cb(CB.OBJ_LIST) : cb(CB.OBJ_ARCH_LIST));

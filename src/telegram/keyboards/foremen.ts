@@ -13,7 +13,7 @@ export function foremenListKeyboard(foremen: ForemanWithAssignments[], page: num
   }
 
   appendPagination(keyboard, CB.FRM_LIST, paged.page, paged.totalPages);
-  keyboard.row().text("◀️ Меню", cb(CB.MENU));
+  keyboard.row().text("📝 Заявки", cb(CB.APP_LIST)).row().text("◀️ Меню", cb(CB.MENU));
   return keyboard;
 }
 
