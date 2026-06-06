@@ -49,9 +49,7 @@ export const CB = {
   EXP_DEL: "ED",
   EXP_DEL_CONFIRM: "EDC",
 
-  REP_MENU: "RM",
   REP_OBJ: "RO",
-  REP_FRM: "RF",
 
   PAGE: "P",
   NOOP: "x"
@@ -84,9 +82,7 @@ export const ADMIN_CODES = new Set<string>([
   CB.APP,
   CB.APP_ACCEPT,
   CB.APP_DECLINE,
-  CB.REP_MENU,
-  CB.REP_OBJ,
-  CB.REP_FRM
+  CB.REP_OBJ
 ]);
 
 export function cb(code: string, ...args: string[]): string {
