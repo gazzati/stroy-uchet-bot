@@ -39,10 +39,13 @@ yarn install --immutable
 cp .env.example .env
 ```
 
-Запустить PostgreSQL:
+Поднять PostgreSQL (любым удобным способом — локальный сервер или отдельный
+контейнер) и прописать его в `DATABASE_URL` в `.env`. Например:
 
 ```bash
-docker compose up -d postgres
+docker run -d --name stroy-uchet-pg -p 5432:5432 \
+  -e POSTGRES_DB=stroy_uchet_bot -e POSTGRES_PASSWORD=postgres \
+  postgres:16-alpine
 ```
 
 Применить миграции:

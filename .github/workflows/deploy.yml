@@ -83,5 +83,5 @@ jobs:
             fi
 
             docker compose --env-file .env --env-file .env.deploy pull stroy-uchet-bot
-            docker compose --env-file .env --env-file .env.deploy up -d stroy-uchet-bot postgres
+            docker compose --env-file .env --env-file .env.deploy up -d stroy-uchet-bot
 

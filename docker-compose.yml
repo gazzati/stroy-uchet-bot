@@ -3,29 +3,6 @@ services:
     image: gazzati/stroy-uchet-bot:${IMAGE_TAG:-latest}
     restart: unless-stopped
     env_file: .env
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/stroy_uchet_bot
     command: ["sh", "-c", "node build/db/migrate.js && node build/index.js"]
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: stroy_uchet_bot
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d stroy_uchet_bot"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-volumes:
-  postgres_data:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
