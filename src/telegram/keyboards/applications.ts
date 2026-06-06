@@ -12,7 +12,7 @@ export function applicationsListKeyboard(applications: ForemanApplication[], pag
   }
 
   appendPagination(keyboard, CB.APP_LIST, paged.page, paged.totalPages);
-  keyboard.row().text("◀️ Меню", cb(CB.MENU));
+  keyboard.row().text("◀️ Бригадиры", cb(CB.FRM_LIST));
   return keyboard;
 }
 
